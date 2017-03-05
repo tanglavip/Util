@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>自定义指令</title>
+    <meta charset="UTF-8">
+</head>
+
+<body ng-app="myApp">
+    
+    <div ng-controller="main">
+        <!--根据repeatNum的次数，来渲染几次div-->
+        <div repeat-num="3"><h1>大秦帝国</h1></div>
+    </div>    
+
+
+
+    <script type="text/javascript" src="angular.js"></script>
+    <script type="text/javascript">
+        angular.module('myApp', [])
+        .controller('main', function($scope){
+            
+        })
+        .directive('repeatNum',function(){
+            return {
+                restrict:'A',
+                /* link函数：实现自定义指令的功能
+                 * @scope：指令的作用域
+                 * @jqLite：获取自定义指令元素的jqLite元素
+                 * @attrs：指令元素的属性对象
+                */
+                link:function(scope,jqLite,attrs){
+                    var num = attrs.repeatNum; 
+                    // for (var i=0; i < num ; i++) {
+                    //     var dom = jqLite.clone();
+                    //     jqLite.after(dom);
+                    // }  
+                    var dom = jqLite.children();
+                    for(var i =0 ; i< num ;i++){
+                        var cloneDom = dom.clone();
+                        jqLite.after(cloneDom);
+                    } 
+                }
+            };
+        })
+
+
+    </script>
+</body>
+
+</html>
+
+<!--
+    在angular中创建自定义指令使用directive方法，类似于filter方法一样。
+    使用自定义指令分为2步：
+        （1）在页面中，添加到DOM园中中
+        （2）在js中定义指令，通过directive方法
+    directive方法：
+        第一个参数：指令的名称（在DOM使用-分割单词，在指令名称中使用驼峰式明明规则）
+        第二个参数：指令处理函数
+
+    自定义指令的属性：
+        restrict：ECMA，即元素、类、注释、属性。最常用的就是元素和属性的方式
+        template：表示自定义指令模板
+        replace：是否使用模板替换元素，true/false
+    
+    自定义指令的作用域：
+        每个指令都有一个作用域，我们可以使用scope来约束这个作用域
+        可以通过controller属性定义控制器，来创建一个作用域
+        scope：值由三种：
+            （1）true：自定义指令的作用域是独立的，不会受到父级作用域的影响
+            （2）false：scope的默认值，指令作用域和父级作用域是同一个（指令使用父级作用域）。
+            （3）{}：作用域是一个对象。此时自定义指令会创建一个独立的作用域，但是使用自定义指令模板中是用不了的，模板使用的还是父作用的数据
+
+
+    模板作用域：
+        （1）未定义scope，即scope为false。自定义指令的作用域和子作用域是同一个作用域，它们的变量行为一致
+        （2）true：自定义指令作用域是独立的，因此父作用域修改数据不会影响子作用域，子作用域修改变量也不会影响父作用域
+        （3）{}：与值为true效果一样，自定义指令使用其自身数据渲染
+    
+    @修饰符：实现父作用域向子作用域中传递数据的一种：
+            第一步：在自定义元素上创建属性（这个属性是一个普通属性，值就是一个普通的字符串，因此想将副作用域中变量传递进来，必须使用插值语法）
+            第二步：在scope属性中，通过@符号将属性值与作用域变量绑定起来
+            注：此时在子作用域中是无法修改父作用域数据的。子作用域中数据被父作用与数据覆盖了！
+-->
